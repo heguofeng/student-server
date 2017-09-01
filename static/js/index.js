@@ -17,6 +17,7 @@ var app = new Vue({
         checkAll: false, //是否都已选中
         noData: false,
         regFlag: false,
+        loginFlag: false,
         admin: {
             phone: "",
             password: "",
@@ -232,6 +233,7 @@ var app = new Vue({
             this.showFlag = false;
             this.showFlag2 = false;
             this.regFlag = false;
+            this.loginFlag = false;
         },
         //获取验证码
         getCode: function() {
@@ -254,7 +256,7 @@ var app = new Vue({
                 }
             }
             axios.post("/api/security_code", { "phone": _this.admin.phone }).then(function(response) {
-                console.log("获取验证码成功");
+                console.log(response.data.result);
                 time(); //倒计时
             }).catch(function(error) {
                 console.log("获取验证码失败" + error);
@@ -263,18 +265,37 @@ var app = new Vue({
         //注册
         signIn: function() {
             var _this = this;
-            axios.post('/api/admin', { "token": _this.token }).then(function(response) {
-                var id = JSON.parse(response.data.admin).data.id; //得到新建记录的id
-                console.log(id);
-                _this.admin.token = _this.token;
-                axios.put('/api/admin/' + id, _this.admin).then(function(response) {
-                    _this.regFlag = false;
-                    layer.msg("已成功注册账号： " + JSON.parse(response.data.admin).data.attributes.phone, { icon: 1, time: 1500 });
-                }).catch(function(err) {
-                    alert(err);
-                });
+            axios.post('/api/admin', { "token": _this.token, "security_code": _this.admin.security_code }).then(function(response) {
+                if (response.data.success) {
+                    var id = JSON.parse(response.data.result).data.id; //得到新建记录的id
+                    _this.admin.token = _this.token;
+                    axios.put('/api/admin/' + id, _this.admin).then(function(response) {
+                        _this.regFlag = false;
+                        layer.msg("已成功注册账号： " + JSON.parse(response.data.admin).data.attributes.phone, { icon: 1, time: 1500 });
+                    }).catch(function(err) {
+                        alert(err);
+                    });
+                } else {
+                    layer.msg(response.data.result,
+                        function() {
+                            _this.admin.security_code = ""; //清空输入框
+                        });
+                }
             }).catch(function(err) {
                 console.log(err);
+            });
+        },
+        //登录
+        loginIn: function() {
+            var _this = this;
+            axios.post('/api/admin/login', _this.admin).then(function(response) {
+                if (response.data.success == true) {
+                    console.log("登陆成功")
+                } else {
+                    console.log("登陆失败")
+                }
+            }).catch(function(error) {
+                console.log("登陆失败" + error)
             });
         }
     }

@@ -22,7 +22,7 @@ a:hover .fa {
 }
 
 .top {
-    background-color: #041421;
+    background-color: #566d84;
     width: 100%;
 }
 
@@ -35,20 +35,6 @@ a:hover .fa {
 .top_header_l img {
     margin: 2px auto;
     border-radius: 50%;
-}
-
-@keyframes xuanzhuan {
-    0% {
-        transform: rotate(0deg);
-    }
-    /*50%{transform: rotate(180deg);}*/
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.top_header_l img:hover {
-    animation: xuanzhuan 1s linear infinite;
 }
 
 .logo_txt {
@@ -100,15 +86,15 @@ a:hover .fa {
     z-index: 2;
 }
 
+.header h1 {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
 .header h1 a {
     color: #0A0909;
     font-weight: 700;
     /* text-shadow: 1px 1px #0A090A; */
-}
-
-.header h1+p {
-    color: #fff;
-    color: #0A0909;
 }
 
 .main {
@@ -135,10 +121,6 @@ a:hover .fa {
 
 .main_table {
     padding: 5px 10px;
-}
-
-.fl {
-    float: left;
 }
 
 .btn_left {
@@ -281,9 +263,10 @@ a:hover .fa {
 }
 
 .yzc {
-    width: 100px;
+    width: 150px;
     float: right;
     margin-right: 20px;
+    text-align: right;
 }
 
 .yzc a {

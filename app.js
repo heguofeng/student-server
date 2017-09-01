@@ -7,7 +7,8 @@ const controller = require('./controller');
 const templating = require('./templating');
 
 const rest = require('./rest');
-
+const session = require('koa-session2');
+// const Store = require("./Store.js");
 const app = new Koa();
 
 //跨域
@@ -27,6 +28,11 @@ app.use(async(ctx, next) => {
     execTime = new Date().getTime() - start;
     ctx.response.set('X-Response-Time', `${execTime}ms`);
 });
+
+app.use(session({
+    key: "SESSIONID",
+    // store: new Store()
+}));
 
 // static file support:如果是开发环境，则处理静态文件
 if (!isProduction) {
