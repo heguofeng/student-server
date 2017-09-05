@@ -12,38 +12,38 @@ var options = {
 };
 var ucpaas = new ucpaasClass(options);
 
-// 导入WebSocket模块:
-// const WebSocket = require('ws');
-// 引用Server类:
-// const WebSocketServer = WebSocket.Server;
-
 module.exports = {
     //获取token
     'GET /api/token': async(ctx, next) => {
         //异步方法一  async/await，同步形式
-        var st = new Date().getTime();
-        console.log("token开始" + st)
         return _webHttp.httpGet(`${ip}/token?user=admin&password=123456`).then(function(data) {
+            let _data = JSON.parse(data).data.attributes.token; //为了隐藏data里的服务器ip，做一步数据处理
             ctx.rest({
-                token: data
+                result: _data
             });
-            var td = new Date().getTime() - st;
-            console.log(`token时间：${td}ms`);
         }, function(error) {
             console.error("出错了：", error);
         });
     },
     //获取所有学生
     'GET /api/students': async(ctx, next) => {
-        //方法二，promise嵌套
-        var st = new Date().getTime();
-        console.log("student开始" + st)
         return _webHttp.httpGet(`${ip}/records?${sample_S}`).then(function(data) {
-            ctx.rest({
-                students: data
+            let _data = JSON.parse(data).data;
+            let dataArr = [];
+            _data.forEach(function(item) {
+                let dataJson = {
+                    _id: item.data.attributes._id,
+                    sex: item.data.attributes.sex,
+                    name: item.data.attributes.name,
+                    age: item.data.attributes.age,
+                    college: item.data.attributes.college,
+                    student_id: item.data.attributes.student_id
+                };
+                dataArr.push(dataJson);
             });
-            var td = new Date().getTime() - st;
-            console.log(`学生时间：${td}ms`);
+            ctx.rest({
+                result: dataArr
+            });
         }, function(error) {
             console.error("读取学生数据出错了：", error);
         });
@@ -55,12 +55,12 @@ module.exports = {
             },
             token = ctx.request.body.token;
         return _webHttp.httpPost(`${ip}/record?token=${token}`, JSON.stringify(postDoc)).then(function(data) {
+            let _data = JSON.parse(data).data.id; //传递ID
             ctx.rest({
-                student: data
-            }, function(error) {
-                console.log("新建出错了：" + error)
+                result: _data
             });
-            // console.log("新建学生" + data);
+        }, function(error) {
+            console.log("新建出错了：" + error)
         });
     },
     //删除学生
@@ -69,9 +69,10 @@ module.exports = {
         var id = ctx.params.id;
         var token = ctx.params.token;
         return _webHttp.httpDelete(`${ip}/record/${id}?token=${token}&${sample_S}`).then(function(data) {
+            let _data = JSON.parse(data).data.attributes;
             console.log("删除数据为： " + data);
             ctx.rest({
-                result: data
+                result: _data
             });
         }, function(error) {
             console.log("删除数据失败：" + error);
@@ -93,11 +94,10 @@ module.exports = {
                 "student_id": ctx.request.body.student_id
             }
         }
-        console.log(JSON.stringify(putDoc));
         return _webHttp.httpPut(`${ip}/record/${id}?token=${token}&${sample_S}`, JSON.stringify(putDoc)).then(function(data) {
-            // console.log("修改后的数据" + data);
+            let _data = JSON.parse(data).data.attributes;
             ctx.rest({
-                student: data
+                result: _data
             });
         }, function(error) {
             console.log("修改数据失败：" + error);
@@ -105,11 +105,11 @@ module.exports = {
     },
     //查询某位学生
     'GET /api/student/:id': async(ctx, next) => {
-        console.log("正在执行查询学生 号码" + ctx.params.id);
         var id = ctx.params.id;
         return _webHttp.httpGet(`${ip}/record/${id}?${sample_S}`).then(function(data) {
+            let _data = JSON.parse(data).data.attributes;
             ctx.rest({
-                student: data
+                result: _data
             });
         }, function(error) {
             console.log("查询一条数据失败：" + error);
@@ -141,15 +141,6 @@ module.exports = {
             result: "已删除所选中的学生"
         });
     },
-    // 'GET /api/ws/:token': async(ctx, next) => {
-    //     console.log("ws步骤");
-    //     let token = ctx.params.token;
-    //     var ws = new WebSocket(`ws://106.14.145.165:3334/record/subscribe?sample=student&token=${token}`);
-    //     console.log(ws);
-    //     ctx.rest({
-    //         result: ws
-    //     });
-    // }
     //注册管理员1新建
     'POST /api/admin': async(ctx, next) => {
         var postDoc = {

@@ -79,7 +79,7 @@
                                 <td v-text="student.student_id "></td>
                                 <td>
                                     <!-- 修改 -->
-                                    <button class="btn btn-info btn_left update " type="button " v-on:click="putStudent(student._id) "><i class="fa fa-pencil "></i></button>
+                                    <button class="btn btn-info btn_left update " type="button " v-on:click="getStudent(student._id) "><i class="fa fa-pencil "></i></button>
                                     <!-- 删除 -->
                                     <button class="btn btn-danger btn_left delete " type="button " v-on:click="deleteStudent(student._id) "> <i class="fa fa-trash-o fa-lg "></i></button>
                                 </td>
@@ -157,7 +157,7 @@
             <!-- 修改 -->
             <div class="add_box " id="put_box " :class="{ 'frameBox':showFlag2} " v-show="showFlag2 ">
                 <h3>修改学生</h3>
-                <form class="form-horizontal " id="app2 " v-on:submit.prevent="updateForm(student._id) ">
+                <form class="form-horizontal " id="app2 " v-on:submit.prevent="putStudent(student._id) ">
                     <div class="form-group ">
                         <label for="college " class="col-sm-4 control-label ">学院名称</label>
                         <div class="col-sm-6 ">

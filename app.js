@@ -1,14 +1,16 @@
 const Koa = require('koa');
-
 const bodyParser = require('koa-bodyparser');
-
 const controller = require('./controller');
-
 const templating = require('./templating');
-
 const rest = require('./rest');
 const session = require('koa-session2');
-// const Store = require("./Store.js");
+const config = require('./config');
+
+// 导入WebSocket模块:
+const WebSocket = require('ws');
+// 引用Server类:
+const WebSocketServer = WebSocket.Server;
+
 const app = new Koa();
 
 //跨域
@@ -55,5 +57,26 @@ app.use(rest.restify());
 //最后一个middleware处理URL路由：
 app.use(controller());
 
-app.listen(3000);
+var server = app.listen(config.port);
 console.log('app started at port 3000...');
+
+let wss = new WebSocketServer({
+    server: server
+});
+wss.on('connection', function(ws, req) {
+    const ip = req.connection.remoteAddress;
+    ws.on('message', function(message) {
+        var ws2 = new WebSocket(`ws://106.14.145.165:3334/record/subscribe?sample=student&token=${message}`);
+        ws2.on('message', function(message) {
+            //判断是否是第一条提示语句，无用
+            if (JSON.parse(message).successmsg) {
+                ws.send(message);
+            } else {
+                let _message = JSON.parse(message);
+                _message.body.links = "";
+                _message.ip = ip;
+                ws.send(JSON.stringify(_message));
+            }
+        });
+    });
+});

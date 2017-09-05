@@ -42,25 +42,27 @@ var app = new Vue({
             var _this = this;
             // 获取token值
             axios.get('/api/token').then(function(response) {
-                _this.token = JSON.parse(response.data.token).data.attributes.token;
+                _this.token = response.data.result;
             }).catch(function(error) {
                 console.log("获取token失败：" + error);
             });
             //获取学生
             axios.get('/api/students').then(function(response) {
-                _this.students = []; //重置
-                var _Date = JSON.parse(response.data.students);
-                _Date.data.forEach(function(item) {
+                let studentArr = []; //重置
+                let data = response.data.result;
+                // var _Date = JSON.parse(response.data.students);
+                data.forEach(function(item) {
                     var Data = {
-                        _id: item.data.attributes._id,
-                        sex: item.data.attributes.sex,
-                        name: item.data.attributes.name,
-                        age: item.data.attributes.age,
-                        college: item.data.attributes.college,
-                        student_id: item.data.attributes.student_id
+                        _id: item._id,
+                        sex: item.sex,
+                        name: item.name,
+                        age: item.age,
+                        college: item.college,
+                        student_id: item.student_id
                     }
-                    _this.students.push(Data);
+                    studentArr.push(Data);
                 });
+                _this.students = studentArr;
                 layer.close(ii); //关闭加载
                 //判断一下是否没有数据
                 if (_this.students.length == 0) {
@@ -76,25 +78,24 @@ var app = new Vue({
         submitForm: function() {
             var _this = this;
             axios.post('/api/student', { "token": _this.token }).then(function(response) {
-                var id = JSON.parse(response.data.student).data.id; //得到新建记录的id
+                var id = response.data.result; //得到新建记录的id
                 _this.addStudent.token = _this.token;
                 axios.put('/api/student/' + id, _this.addStudent).then(function(response) {
-                    // _this.newLoad();
                     _this.showFlag = false;
-                    layer.msg("已成功添加学生： " + JSON.parse(response.data.student).data.attributes.name, { icon: 1, time: 1500 });
+                    layer.msg("已成功添加学生： " + response.data.result.name, { icon: 1, time: 1500 });
                 }).catch(function(err) {
-                    alert(err);
+                    console.log(err);
                 });
             }).catch(function(err) {
                 console.log(err);
             });
         },
-        // 点击修改按钮
-        putStudent: function(id) {
+        // 点击修改按钮1，查询某位信息
+        getStudent: function(id) {
             var _this = this;
             _this.showFlag2 = true;
             axios.get('/api/student/' + id).then(function(response) {
-                var Data = JSON.parse(response.data.student).data.attributes;
+                var Data = response.data.result;
                 var _Data = {
                     _id: Data._id,
                     college: Data.college,
@@ -108,14 +109,13 @@ var app = new Vue({
                 alert(err);
             });
         },
-        //修改
-        updateForm: function(id) {
+        //正式进行修改操作修改2
+        putStudent: function(id) {
             var _this = this;
             //将token放进student里一起传过去
             var msg = layer.msg('正在修改。。。', { icon: 16 });
             _this.student.token = _this.token;
             axios.put('/api/student/' + id, _this.student).then(function(response) {
-                // _this.newLoad();
                 layer.close(msg);
                 layer.msg('已成功修改', { icon: 1, time: 1500 });
                 _this.showFlag2 = false;
@@ -130,7 +130,7 @@ var app = new Vue({
             layer.confirm('确定删除吗？?', { icon: 3, title: '提示' }, function(index) {
                 axios.delete('/api/student/' + _this.token + '/' + id).then(function(response) {
                     // _this.newLoad();
-                    layer.msg("已删除学生： " + JSON.parse(response.data.result).data.attributes.name, { icon: 1, time: 1500 });
+                    layer.msg("已删除学生： " + response.data.result.name, { icon: 1, time: 1500 });
                 }).catch(function(err) {
                     alert(err);
                 })
@@ -219,8 +219,11 @@ var app = new Vue({
         websocket: function() {
             var _this = this;
             axios.get('/api/token').then(function(response) {
-                _this.token = JSON.parse(response.data.token).data.attributes.token;
-                var ws = new WebSocket(`ws://106.14.145.165:3334/record/subscribe?sample=student&token=${_this.token}`);
+                _this.token = response.data.result;
+                var ws = new WebSocket(`ws://${location.hostname}:3000`);
+                ws.onopen = function() {
+                    ws.send(_this.token);
+                }
                 ws.onmessage = function() {
                     app.newLoad();
                 };
