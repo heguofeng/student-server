@@ -8,7 +8,7 @@ function createEnv(path, opts) {
         throwOnUndefined = opts.throwOnUndefined || false,
         env = new nunjucks.Environment(
             //只在 node 端可用，他可从文件系统中加载模板，Path为查找模板的路径，可以是一个也可以是多个，默认为当前的工作目录。
-            new nunjucks.FileSystemLoader(path || 'views', {
+            new nunjucks.FileSystemLoader(path || './views', {
                 noCache: noCache, // 如果为 true，不使用缓存，模板每次都会重新编译
                 watch: watch, // 如果为 true，当文件系统上的模板变化了，系统会自动更新他
             }), {

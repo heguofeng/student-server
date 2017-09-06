@@ -4,8 +4,8 @@ const controller = require('./controller');
 const templating = require('./templating');
 const rest = require('./rest');
 const session = require('koa-session2');
-const config = require('./config');
-
+const config = require('../config');
+const path = require('path');
 
 // 导入WebSocket模块:
 const WebSocket = require('ws');
@@ -40,14 +40,14 @@ app.use(session({
 // static file support:如果是开发环境，则处理静态文件
 if (!isProduction) {
     let staticFiles = require('./static-files');
-    app.use(staticFiles('/static/', __dirname + '/static'));
+    app.use(staticFiles('/static/', path.join(__dirname, './../static')));
 }
 
 //第三个解析POST请求
 app.use(bodyParser());
 
 // 第四个middleware负责给ctx加上render() 来使用Nunjucks：
-app.use(templating('views', {
+app.use(templating(path.join(__dirname, './views'), {
     noCache: !isProduction,
     watch: !isProduction
 }));
