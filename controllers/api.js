@@ -3,6 +3,8 @@ const APIError = require('../rest').APIError;
 const ip = "http://106.14.145.165:3333";
 var sample_S = "sample=student";
 var sample_A = "sample=student_admin";
+const { uploadFile } = require('../upload');
+const path = require('path');
 
 //云之讯
 var ucpaasClass = require('ucpaas-sdk/lib/ucpaasClass');
@@ -11,20 +13,11 @@ var options = {
     token: '471416c20b89d075cdc90a30e0a74d9b',
 };
 var ucpaas = new ucpaasClass(options);
+const index = require('./index')
 
 module.exports = {
     //获取token
-    'GET /api/token': async(ctx, next) => {
-        //异步方法一  async/await，同步形式
-        return _webHttp.httpGet(`${ip}/token?user=admin&password=123456`).then(function(data) {
-            let _data = JSON.parse(data).data.attributes.token; //为了隐藏data里的服务器ip，做一步数据处理
-            ctx.rest({
-                result: _data
-            });
-        }, function(error) {
-            console.error("出错了：", error);
-        });
-    },
+    'GET /api/token': index.getToken,
     //获取所有学生
     'GET /api/students': async(ctx, next) => {
         return _webHttp.httpGet(`${ip}/records?${sample_S}`).then(function(data) {
@@ -245,5 +238,22 @@ module.exports = {
         }, function(error) {
             console.log("查询管理员：" + error);
         });
+    },
+    //上传文件
+    'POST /api/upload': async(ctx, next) => {
+        // 上传文件请求处理
+        let serverFilePath = path.resolve(__dirname, '../static/uploads') //该方法直接跳转至上级目录的static。。。
+            // 上传文件事件
+        return uploadFile(ctx, {
+            fileType: 'album', // common or album 文件类别
+            path: serverFilePath
+        }).then(function(result) {
+            ctx.rest({
+                result: result
+            });
+        }, function(error) {
+            console.log("上传失败" + error);
+        });
+
     }
 };
