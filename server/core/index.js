@@ -17,7 +17,6 @@ module.exports = {
     getStudents: async(ctx, next) => {
         return _webHttp.httpGet(`${config.serverIp}/records?${config.sample_S}`).then(function(data) {
             let _data = JSON.parse(data).data;
-            console.log(_data)
             let dataArr = [];
             if (_data.length == 0) {
                 ctx.rest({
@@ -120,7 +119,7 @@ module.exports = {
             ids = ctx.request.body.ids;
         ids.forEach(function(id) {
             _webHttp.httpDelete(`${config.serverIp}/record/${id}?token=${token}&${config.sample_S}`).then(function(data) {
-
+                console.log("删除成功！")
             }, function(error) {
                 console.log("删除所选中的学生失败" + error);
             });

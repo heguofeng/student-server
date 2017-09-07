@@ -18,9 +18,9 @@ module.exports = {
             return _webHttp.httpPost(`${config.serverIp}/record?token=${token}`, JSON.stringify(postDoc)).then(function(data) {
                 ctx.rest({
                     success: true,
-                    result: data
+                    result: JSON.parse(data).data.id
                 });
-                console.log("新建管理员" + data);
+                console.log("新建管理员" + JSON.parse(data).data.id);
             });
         } else {
             ctx.rest({
@@ -40,11 +40,9 @@ module.exports = {
                 "security_code": ctx.request.body.security_code,
             }
         }
-        console.log(JSON.stringify(putDoc));
         return _webHttp.httpPut(`${config.serverIp}/record/${id}?token=${token}&${config.sample_A}`, JSON.stringify(putDoc)).then(function(data) {
-            console.log("修改后的数据" + data);
             ctx.rest({
-                admin: data
+                result: JSON.parse(data).data.attributes
             });
         }, function(error) {
             console.log("修改数据失败：" + error);
@@ -53,10 +51,6 @@ module.exports = {
     postSecurityCode: async(ctx, next) => {
         var phone = ctx.request.body.phone;
         console.log("获取验证码:" + phone);
-        //开发者账号信息查询
-        // ucpaas.getDevinfo(function(status, responseText) {
-        //     console.log('code: ' + status + ', text: ' + responseText);
-        // });
         //生成随机数
         var num = "";
         for (let i = 0; i < 6; i++) {
@@ -65,9 +59,8 @@ module.exports = {
         //短信验证码
         var appId = '82376abb35ee46e3938f84477ec06e9d';
         var to = phone;
-        var templateId = '136720';
-        var param = parseInt(num);
-        // console.log("验证码是：" + param);
+        var templateId = '136720'; //模板id
+        var param = parseInt(num); //验证码
         ctx.session.param = param;
         ucpaas.templateSMS(appId, to, templateId, param, function(status, responseText) {
             console.log('code: ' + status + ', text: ' + responseText);
@@ -101,7 +94,7 @@ module.exports = {
                 ctx.session.phone = postDoc.phone;
                 ctx.rest({
                     success: true,
-                    result: res,
+                    result: _res.data[0].data.attributes,
                 });
             }
         }, function(error) {

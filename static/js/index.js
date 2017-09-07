@@ -250,7 +250,6 @@ var app = new Vue({
                     _this.codeBtn = true;
                 } else {
                     _this.getSecrityCode = "重新获取" + wait + "秒";
-                    console.log(wait)
                     _this.codeBtn = false;
                     wait--;
                     setTimeout(function() {
@@ -259,7 +258,7 @@ var app = new Vue({
                 }
             }
             axios.post("/api/security_code", { "phone": _this.admin.phone }).then(function(response) {
-                console.log(response.data.result);
+                // console.log(response.data.result);
                 time(); //倒计时
             }).catch(function(error) {
                 console.log("获取验证码失败" + error);
@@ -270,13 +269,13 @@ var app = new Vue({
             var _this = this;
             axios.post('/api/admin', { "token": _this.token, "security_code": _this.admin.security_code }).then(function(response) {
                 if (response.data.success) {
-                    var id = JSON.parse(response.data.result).data.id; //得到新建记录的id
+                    var id = response.data.result; //得到新建记录的id
                     _this.admin.token = _this.token;
                     axios.put('/api/admin/' + id, _this.admin).then(function(response) {
                         _this.regFlag = false;
-                        layer.msg("已成功注册账号： " + JSON.parse(response.data.admin).data.attributes.phone, { icon: 1, time: 1500 });
+                        layer.msg("已成功注册账号： " + response.data.result.phone, { icon: 1, time: 1500 });
                     }).catch(function(err) {
-                        alert(err);
+                        alert("注册失败" + err);
                     });
                 } else {
                     layer.msg(response.data.result,
