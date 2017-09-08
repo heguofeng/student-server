@@ -61,7 +61,7 @@ module.exports = {
         var token = ctx.params.token;
         return _webHttp.httpDelete(`${config.serverIp}/record/${id}?token=${token}&${config.sample_S}`).then(function(data) {
             let _data = JSON.parse(data).data.attributes;
-            console.log("删除数据为： " + data);
+            // console.log("删除数据为： " + data);
             ctx.rest({
                 result: _data
             });

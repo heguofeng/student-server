@@ -222,9 +222,11 @@ var app = new Vue({
                 _this.token = response.data.result;
                 var ws = new WebSocket(`ws://${location.hostname}:3000`);
                 ws.onopen = function() {
+                    console.log("打开了ws")
                     ws.send(_this.token);
-                }
+                };
                 ws.onmessage = function() {
+                    console.log('收到了消息')
                     app.newLoad();
                 };
             }).catch(function(error) {

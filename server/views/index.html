@@ -104,13 +104,13 @@
                     </table>
                 </div>
                 <!-- main_table -->
-                <div class="no-data " v-if="noData "><img src="../static/images/no-data.png " width="200 " height="200 " alt="没有数据 ">
+                <div class="no-data " v-cloak v-if="noData "><img src="../static/images/no-data.png " width="200 " height="200 " alt="没有数据 ">
                     <p>没有数据</p>
                 </div>
             </div>
             <!-- main -->
 
-            <div class="add_box " id="add_box " :class="{ 'frameBox':showFlag} " v-show="showFlag ">
+            <div class="add_box " id="add_box " :class="{ 'frameBox':showFlag} " v-show="showFlag " v-cloak>
                 <h3>添加新学生</h3>
                 <form class="form-horizontal " id="student-form " v-on:submit.prevent="submitForm ">
                     <div class="form-group ">
@@ -155,7 +155,7 @@
             <!-- #add_box -->
 
             <!-- 修改 -->
-            <div class="add_box " id="put_box " :class="{ 'frameBox':showFlag2} " v-show="showFlag2 ">
+            <div class="add_box " id="put_box " :class="{ 'frameBox':showFlag2} " v-show="showFlag2 " v-cloak>
                 <h3>修改学生</h3>
                 <form class="form-horizontal " id="app2 " v-on:submit.prevent="putStudent(student._id) ">
                     <div class="form-group ">
@@ -198,7 +198,7 @@
             </div>
 
             <!--注册框-->
-            <div class="loginBox " :class="{ 'frameBox':regFlag} " v-show="regFlag ">
+            <div class="loginBox " :class="{ 'frameBox':regFlag} " v-show="regFlag " v-cloak>
                 <div class="login_title clearfix ">
                     <h3>注册账号</h3>
                     <div class="yzc ">
@@ -236,7 +236,7 @@
             </div>
             <!-- put_box -->
             <!--登录框-->
-            <div class="loginBox " :class="{ 'frameBox':loginFlag} " v-show="loginFlag ">
+            <div class="loginBox " :class="{ 'frameBox':loginFlag} " v-show="loginFlag " v-cloak>
                 <div class="login_title clearfix ">
                     <h3>登录</h3>
                     <div class="yzc ">
@@ -261,7 +261,7 @@
                 </form>
             </div>
             <!-- put_box -->
-            <div class="mask" v-show="showFlag||showFlag2||regFlag||loginFlag " v-on:click="closeBox "></div>
+            <div class="mask" v-show="showFlag||showFlag2||regFlag||loginFlag " v-on:click="closeBox " v-cloak></div>
         </div>
         <!-- wrap -->
     </div>

@@ -6,17 +6,11 @@ const rest = require('./rest');
 const session = require('koa-session2');
 const config = require('../config');
 const path = require('path');
-
 // 导入WebSocket模块:
 const WebSocket = require('ws');
 // 引用Server类:
 const WebSocketServer = WebSocket.Server;
-
 const app = new Koa();
-
-//跨域
-// var cors = require('koa2-cors');
-// app.use(cors()); 
 
 //声明当前不是开发环境
 const isProduction = process.env.NODE_ENV === 'production';
@@ -29,6 +23,7 @@ app.use(async(ctx, next) => {
         execTime;
     await next(); //直接跳转至下一个中间件，后面的两行代码最后执行
     execTime = new Date().getTime() - start;
+    console.log("完成时间：" + execTime + "ms")
     ctx.response.set('X-Response-Time', `${execTime}ms`);
 });
 
@@ -61,6 +56,7 @@ app.use(controller());
 var server = app.listen(config.port);
 console.log('app started at port 3000...');
 
+//建立消息订阅
 let wss = new WebSocketServer({
     server: server
 });
@@ -68,6 +64,9 @@ wss.on('connection', function(ws, req) {
     const ip = req.connection.remoteAddress;
     ws.on('message', function(message) {
         var ws2 = new WebSocket(`ws://106.14.145.165:3334/record/subscribe?sample=student&token=${message}`);
+        ws2.on('open', function() {
+            // console.log('成功连接服务端')
+        });
         ws2.on('message', function(message) {
             //判断是否是第一条提示语句，无用
             if (JSON.parse(message).successmsg) {
@@ -76,7 +75,9 @@ wss.on('connection', function(ws, req) {
                 let _message = JSON.parse(message);
                 _message.body.links = "";
                 _message.ip = ip;
-                ws.send(JSON.stringify(_message));
+                if (ws.readyState == ws.OPEN) { //这个状态一定要判断
+                    ws.send(JSON.stringify(_message));
+                }
             }
         });
     });

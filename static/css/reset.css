@@ -110,3 +110,7 @@ figure
 .fr {
     float: right;
 }
+
+[v-cloak] {
+    display: none;
+}
